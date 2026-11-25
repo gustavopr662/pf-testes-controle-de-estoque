@@ -1,5 +1,7 @@
 package com.faculdade.testes.estoque.model;
 
+import com.faculdade.testes.estoque.exception.OperacaoEstoqueInvalidaException;
+
 public class Produto {
 
 	private String id;
@@ -15,9 +17,13 @@ public class Produto {
 
 	public Produto(String id, String sku, String nome, int quantidadeAtual, int estoqueMinimo, int estoqueMaximo,
 			boolean ativo) {
-		this.id = id;
-		this.sku = sku;
-		this.nome = nome;
+		this.id = normalizarId(id);
+		this.sku = ValidacaoDominio.validarSku(sku);
+		this.nome = ValidacaoDominio.validarTextoObrigatorio(nome, "Nome do produto");
+		ValidacaoDominio.validarNaoNegativo(quantidadeAtual, "Quantidade atual");
+		ValidacaoDominio.validarNaoNegativo(estoqueMinimo, "Estoque mínimo");
+		validarEstoqueMaximo(estoqueMaximo);
+		validarInvariantes(quantidadeAtual, estoqueMinimo, estoqueMaximo);
 		this.quantidadeAtual = quantidadeAtual;
 		this.estoqueMinimo = estoqueMinimo;
 		this.estoqueMaximo = estoqueMaximo;
@@ -34,7 +40,7 @@ public class Produto {
 	}
 
 	public void setId(String id) {
-		this.id = id;
+		this.id = normalizarId(id);
 	}
 
 	public String getSku() {
@@ -42,7 +48,7 @@ public class Produto {
 	}
 
 	public void setSku(String sku) {
-		this.sku = sku;
+		this.sku = ValidacaoDominio.validarSku(sku);
 	}
 
 	public String getNome() {
@@ -50,7 +56,7 @@ public class Produto {
 	}
 
 	public void setNome(String nome) {
-		this.nome = nome;
+		this.nome = ValidacaoDominio.validarTextoObrigatorio(nome, "Nome do produto");
 	}
 
 	public int getQuantidadeAtual() {
@@ -58,6 +64,8 @@ public class Produto {
 	}
 
 	public void setQuantidadeAtual(int quantidadeAtual) {
+		ValidacaoDominio.validarNaoNegativo(quantidadeAtual, "Quantidade atual");
+		validarInvariantes(quantidadeAtual, this.estoqueMinimo, this.estoqueMaximo);
 		this.quantidadeAtual = quantidadeAtual;
 	}
 
@@ -66,6 +74,8 @@ public class Produto {
 	}
 
 	public void setEstoqueMinimo(int estoqueMinimo) {
+		ValidacaoDominio.validarNaoNegativo(estoqueMinimo, "Estoque mínimo");
+		validarInvariantes(this.quantidadeAtual, estoqueMinimo, this.estoqueMaximo);
 		this.estoqueMinimo = estoqueMinimo;
 	}
 
@@ -74,6 +84,8 @@ public class Produto {
 	}
 
 	public void setEstoqueMaximo(int estoqueMaximo) {
+		validarEstoqueMaximo(estoqueMaximo);
+		validarInvariantes(this.quantidadeAtual, this.estoqueMinimo, estoqueMaximo);
 		this.estoqueMaximo = estoqueMaximo;
 	}
 
@@ -83,5 +95,24 @@ public class Produto {
 
 	public void setAtivo(boolean ativo) {
 		this.ativo = ativo;
+	}
+
+	private static String normalizarId(String id) {
+		return id == null || id.isBlank() ? null : id.trim();
+	}
+
+	private static void validarEstoqueMaximo(int estoqueMaximo) {
+		if (estoqueMaximo < 1) {
+			throw new OperacaoEstoqueInvalidaException("Estoque máximo deve ser maior ou igual a 1");
+		}
+	}
+
+	private static void validarInvariantes(int quantidadeAtual, int estoqueMinimo, int estoqueMaximo) {
+		if (estoqueMinimo > estoqueMaximo) {
+			throw new OperacaoEstoqueInvalidaException("Estoque mínimo não pode exceder o estoque máximo");
+		}
+		if (quantidadeAtual > estoqueMaximo) {
+			throw new OperacaoEstoqueInvalidaException("Quantidade atual não pode exceder o estoque máximo");
+		}
 	}
 }

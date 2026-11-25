@@ -1,5 +1,7 @@
 package com.faculdade.testes.estoque.model;
 
+import com.faculdade.testes.estoque.exception.OperacaoEstoqueInvalidaException;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -26,12 +28,12 @@ public class MovimentacaoEstoque {
 
 	public MovimentacaoEstoque(String id, String skuProduto, Tipo tipo, int quantidade, LocalDateTime dataHora,
 			String usuarioId) {
-		this.id = id;
-		this.skuProduto = skuProduto;
-		this.tipo = tipo;
-		this.quantidade = quantidade;
-		this.dataHora = dataHora;
-		this.usuarioId = usuarioId;
+		setId(id);
+		setSkuProduto(skuProduto);
+		setTipo(tipo);
+		setQuantidade(quantidade);
+		setDataHora(dataHora);
+		setUsuarioId(usuarioId);
 	}
 
 	public MovimentacaoEstoque(MovimentacaoEstoque movimentacao) {
@@ -44,7 +46,7 @@ public class MovimentacaoEstoque {
 	}
 
 	public void setId(String id) {
-		this.id = id;
+		this.id = id == null || id.isBlank() ? UUID.randomUUID().toString() : id.trim();
 	}
 
 	public String getSkuProduto() {
@@ -52,7 +54,7 @@ public class MovimentacaoEstoque {
 	}
 
 	public void setSkuProduto(String skuProduto) {
-		this.skuProduto = skuProduto;
+		this.skuProduto = ValidacaoDominio.validarSku(skuProduto);
 	}
 
 	public Tipo getTipo() {
@@ -60,6 +62,9 @@ public class MovimentacaoEstoque {
 	}
 
 	public void setTipo(Tipo tipo) {
+		if (tipo == null) {
+			throw new OperacaoEstoqueInvalidaException("Tipo de movimentação é obrigatório");
+		}
 		this.tipo = tipo;
 	}
 
@@ -68,7 +73,7 @@ public class MovimentacaoEstoque {
 	}
 
 	public void setQuantidade(int quantidade) {
-		this.quantidade = quantidade;
+		this.quantidade = ValidacaoDominio.validarQuantidadeOperacao(quantidade);
 	}
 
 	public LocalDateTime getDataHora() {
@@ -76,6 +81,9 @@ public class MovimentacaoEstoque {
 	}
 
 	public void setDataHora(LocalDateTime dataHora) {
+		if (dataHora == null) {
+			throw new OperacaoEstoqueInvalidaException("Data e hora da movimentação são obrigatórias");
+		}
 		this.dataHora = dataHora;
 	}
 
@@ -84,6 +92,6 @@ public class MovimentacaoEstoque {
 	}
 
 	public void setUsuarioId(String usuarioId) {
-		this.usuarioId = usuarioId;
+		this.usuarioId = ValidacaoDominio.validarTextoObrigatorio(usuarioId, "Usuário da movimentação");
 	}
 }
