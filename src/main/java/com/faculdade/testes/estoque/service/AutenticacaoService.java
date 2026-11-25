@@ -1,6 +1,8 @@
 package com.faculdade.testes.estoque.service;
 
 import com.faculdade.testes.estoque.exception.AcessoNegadoEstoqueException;
+import com.faculdade.testes.estoque.exception.OperacaoEstoqueInvalidaException;
+import com.faculdade.testes.estoque.model.ValidacaoDominio;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -71,19 +73,21 @@ public class AutenticacaoService {
 		if (usuarioAtivoId == null) {
 			throw new AcessoNegadoEstoqueException("É necessário estar autenticado para operar o estoque");
 		}
-		if (!usuariosAutorizados.contains(usuarioAtivoId)) {
-			throw new AcessoNegadoEstoqueException("Usuário sem permissão para operações de estoque: " + usuarioAtivoId);
+		String id = validarUsuarioId(usuarioAtivoId);
+		if (!usuariosAutorizados.contains(id)) {
+			throw new AcessoNegadoEstoqueException("Usuário sem permissão para operações de estoque: " + id);
 		}
-		if (!usuariosAtivos.contains(usuarioAtivoId)) {
-			throw new AcessoNegadoEstoqueException("Usuário inativo não pode operar o estoque: " + usuarioAtivoId);
+		if (!usuariosAtivos.contains(id)) {
+			throw new AcessoNegadoEstoqueException("Usuário inativo não pode operar o estoque: " + id);
 		}
-		return usuarioAtivoId;
+		return id;
 	}
 
 	private String validarUsuarioId(String usuarioId) {
-		if (usuarioId == null || usuarioId.isBlank()) {
-			throw new AcessoNegadoEstoqueException("Identificador de usuário inválido");
+		try {
+			return ValidacaoDominio.validarUsuarioId(usuarioId);
+		} catch (OperacaoEstoqueInvalidaException excecao) {
+			throw new AcessoNegadoEstoqueException("Identificador de usuário inválido: " + excecao.getMessage());
 		}
-		return usuarioId.trim();
 	}
 }

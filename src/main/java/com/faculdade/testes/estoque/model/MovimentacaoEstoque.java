@@ -92,6 +92,6 @@ public class MovimentacaoEstoque {
 	}
 
 	public void setUsuarioId(String usuarioId) {
-		this.usuarioId = ValidacaoDominio.validarTextoObrigatorio(usuarioId, "Usuário da movimentação");
+		this.usuarioId = ValidacaoDominio.validarUsuarioId(usuarioId);
 	}
 }
