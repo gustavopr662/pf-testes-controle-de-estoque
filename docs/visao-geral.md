@@ -12,8 +12,10 @@ O sistema controla entradas e saídas de produtos com validação de saldo, limi
 ## Cenários de teste
 
 - `EstoqueServiceUnitTest`: testes unitários com mock do listener de alerta.
+- `EstoqueUnitarioTest`: bateria unitária com mocks de autenticação e listener, cobrindo entradas, saídas, limites e alerta no mínimo.
 - `EstoqueFuncionalTest`: fluxo completo de entradas, saídas, reposição e bloqueios com listener em memória.
-- `EstoqueParametrizadoTest`: valores-limite e massas de dados inválidas com `@CsvSource` e `@MethodSource`.
+- `EstoqueParametrizadoTest`: valores-limite (incluindo logo abaixo, no limite e logo acima) e massas de dados inválidas com `@CsvSource` e `@MethodSource`.
+- `EstoqueRegressaoTest`: sentinelas explícitas para a condição de alerta `<=` e para a validação de `estoqueMaximo`.
 - `EstoqueNaoFuncionalTest`: tempo de resposta em lote com `assertTimeout`, lote concorrente distribuído e contenção no mesmo SKU.
 - `EstoqueIntegracaoTest`: colaboração real entre autenticação, estoque e listener em memória, sem mocks.
 - `EstoqueSegurancaTest`: acesso negado, payloads suspeitos e concorrência em saídas.
