@@ -5,6 +5,7 @@ import com.faculdade.testes.estoque.exception.OperacaoEstoqueInvalidaException;
 import com.faculdade.testes.estoque.model.MovimentacaoEstoque;
 import com.faculdade.testes.estoque.model.MovimentacaoEstoque.Tipo;
 import com.faculdade.testes.estoque.model.Produto;
+import com.faculdade.testes.estoque.model.ValidacaoDominio;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,12 +28,16 @@ public class EstoqueService {
 	}
 
 	public synchronized Produto cadastrarProduto(Produto produto) {
-		validarProduto(produto);
-		if (produto.getId() == null || produto.getId().isBlank()) {
-			produto.setId(UUID.randomUUID().toString());
+		if (produto == null) {
+			throw new OperacaoEstoqueInvalidaException("Produto não pode ser nulo");
 		}
-		produto.setSku(produto.getSku().trim());
 		Produto copia = new Produto(produto);
+		if (copia.getId() == null || copia.getId().isBlank()) {
+			copia.setId(UUID.randomUUID().toString());
+		}
+		if (produtos.containsKey(copia.getSku())) {
+			throw new OperacaoEstoqueInvalidaException("SKU já cadastrado: " + copia.getSku());
+		}
 		produtos.put(copia.getSku(), copia);
 		return new Produto(copia);
 	}
@@ -49,13 +54,17 @@ public class EstoqueService {
 		return List.copyOf(copias);
 	}
 
+	public synchronized void alterarStatusProduto(String sku, boolean ativo) {
+		obterProduto(sku).setAtivo(ativo);
+	}
+
 	public synchronized void adicionarListener(AlertaReposicaoListener listener) {
 		listeners.add(Objects.requireNonNull(listener, "listener"));
 	}
 
 	public synchronized MovimentacaoEstoque entrada(String sku, int quantidade) {
 		String usuarioId = autenticacao.exigirUsuarioAutorizado();
-		validarQuantidade(quantidade);
+		ValidacaoDominio.validarQuantidadeOperacao(quantidade);
 		Produto produto = obterProduto(sku);
 		long resultado = (long) produto.getQuantidadeAtual() + quantidade;
 		if (resultado > produto.getEstoqueMaximo()) {
@@ -63,14 +72,12 @@ public class EstoqueService {
 					"Entrada excede o estoque máximo do produto " + produto.getSku());
 		}
 		produto.setQuantidadeAtual((int) resultado);
-		MovimentacaoEstoque movimentacao = registrar(produto, Tipo.ENTRADA, quantidade, usuarioId);
-		notificarAlerta(produto);
-		return movimentacao;
+		return registrar(produto, Tipo.ENTRADA, quantidade, usuarioId);
 	}
 
 	public synchronized MovimentacaoEstoque saida(String sku, int quantidade) {
 		String usuarioId = autenticacao.exigirUsuarioAutorizado();
-		validarQuantidade(quantidade);
+		ValidacaoDominio.validarQuantidadeOperacao(quantidade);
 		Produto produto = obterProduto(sku);
 		if (!produto.isAtivo()) {
 			throw new OperacaoEstoqueInvalidaException("Produto inativo não permite saída: " + produto.getSku());
@@ -81,7 +88,9 @@ public class EstoqueService {
 		}
 		produto.setQuantidadeAtual(produto.getQuantidadeAtual() - quantidade);
 		MovimentacaoEstoque movimentacao = registrar(produto, Tipo.SAIDA, quantidade, usuarioId);
-		notificarAlerta(produto);
+		if (produto.getQuantidadeAtual() <= produto.getEstoqueMinimo()) {
+			notificarAlerta(produto);
+		}
 		return movimentacao;
 	}
 
@@ -92,55 +101,18 @@ public class EstoqueService {
 	}
 
 	private void notificarAlerta(Produto produto) {
-		if (produto.getQuantidadeAtual() <= produto.getEstoqueMinimo()) {
-			Produto snapshot = new Produto(produto);
-			for (AlertaReposicaoListener listener : listeners) {
-				listener.onAlertaReposicao(snapshot);
-			}
+		Produto snapshot = new Produto(produto);
+		for (AlertaReposicaoListener listener : listeners) {
+			listener.onAlertaReposicao(snapshot);
 		}
 	}
 
 	private Produto obterProduto(String sku) {
-		String skuNormalizado = validarSku(sku);
+		String skuNormalizado = ValidacaoDominio.validarSku(sku);
 		Produto produto = produtos.get(skuNormalizado);
 		if (produto == null) {
 			throw new OperacaoEstoqueInvalidaException("Produto não cadastrado: " + skuNormalizado);
 		}
 		return produto;
-	}
-
-	private void validarProduto(Produto produto) {
-		if (produto == null) {
-			throw new OperacaoEstoqueInvalidaException("Produto não pode ser nulo");
-		}
-		String sku = validarSku(produto.getSku());
-		if (produto.getNome() == null || produto.getNome().isBlank()) {
-			throw new OperacaoEstoqueInvalidaException("Nome do produto é obrigatório");
-		}
-		if (produto.getQuantidadeAtual() < 0 || produto.getEstoqueMinimo() < 0 || produto.getEstoqueMaximo() < 1) {
-			throw new OperacaoEstoqueInvalidaException("Quantidades e limites de estoque devem ser válidos");
-		}
-		if (produto.getEstoqueMinimo() > produto.getEstoqueMaximo()) {
-			throw new OperacaoEstoqueInvalidaException("Estoque mínimo não pode exceder o estoque máximo");
-		}
-		if (produto.getQuantidadeAtual() > produto.getEstoqueMaximo()) {
-			throw new OperacaoEstoqueInvalidaException("Quantidade atual não pode exceder o estoque máximo");
-		}
-		if (produtos.containsKey(sku)) {
-			throw new OperacaoEstoqueInvalidaException("SKU já cadastrado: " + sku);
-		}
-	}
-
-	private String validarSku(String sku) {
-		if (sku == null || sku.isBlank()) {
-			throw new OperacaoEstoqueInvalidaException("SKU é obrigatório");
-		}
-		return sku.trim();
-	}
-
-	private void validarQuantidade(int quantidade) {
-		if (quantidade < 1) {
-			throw new OperacaoEstoqueInvalidaException("Quantidade deve ser maior ou igual a 1");
-		}
 	}
 }

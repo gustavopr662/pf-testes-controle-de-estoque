@@ -13,7 +13,7 @@ class EstoqueSmokeTest {
 	@Test
 	void deveExecutarEntradaESaidaBasicas() {
 		AutenticacaoService autenticacao = new AutenticacaoService();
-		autenticacao.concederPermissao("usuario-teste");
+		autenticacao.registrarUsuario("usuario-teste");
 		autenticacao.login("usuario-teste");
 
 		EstoqueService estoque = new EstoqueService(autenticacao);
