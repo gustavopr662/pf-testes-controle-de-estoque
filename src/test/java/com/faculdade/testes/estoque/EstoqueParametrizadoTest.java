@@ -75,6 +75,27 @@ class EstoqueParametrizadoTest {
 		assertEquals(alertaEsperado ? 1 : 0, alertas.quantidadeAlertas());
 	}
 
+	@ParameterizedTest(name = "entrada abaixo/no limite: quantidade={0}, máximo={1}, saldo final={2}")
+	@CsvSource({"9,10,9", "10,10,10"})
+	void entradasAbaixoENoLimiteDoMaximoSaoAceitas(int quantidade, int estoqueMaximo, int saldoEsperado) {
+		EstoqueService estoque = novoServico(0, 0, estoqueMaximo);
+
+		estoque.entrada(SKU, quantidade);
+
+		assertEquals(saldoEsperado, estoque.consultarProduto(SKU).getQuantidadeAtual());
+		assertEquals(0, alertas.quantidadeAlertas());
+	}
+
+	@ParameterizedTest(name = "entrada logo acima do limite: quantidade={0}, máximo={1}")
+	@CsvSource({"11,10"})
+	void entradasAcimaDoMaximoSaoRejeitadas(int quantidade, int estoqueMaximo) {
+		EstoqueService estoque = novoServico(0, 0, estoqueMaximo);
+
+		assertThrows(OperacaoEstoqueInvalidaException.class, () -> estoque.entrada(SKU, quantidade));
+		assertEquals(0, estoque.consultarProduto(SKU).getQuantidadeAtual());
+		assertEquals(0, alertas.quantidadeAlertas());
+	}
+
 	private EstoqueService novoServico(int quantidadeAtual, int estoqueMinimo, int estoqueMaximo) {
 		AutenticacaoService autenticacao = new AutenticacaoService();
 		autenticacao.registrarUsuario(USUARIO);

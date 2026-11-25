@@ -3,7 +3,7 @@
 ## Integrantes
 
 - Gustavo Pereira Ramos — Matrícula: 202510130006
-- Kevin Alexandre Oliveira Gomes — Matrícula: [A definir]
+- Kevin Alexandre Oliveira Gomes — Matrícula: 202510130013
 
 ## Descrição
 
@@ -54,8 +54,10 @@ R4 — Operações com dados inválidos (valores nulos, negativos, SKU vazio ou 
 
 ```bash
 ./mvnw test -Dtest=EstoqueServiceUnitTest
+./mvnw test -Dtest=EstoqueUnitarioTest
 ./mvnw test -Dtest=EstoqueFuncionalTest
 ./mvnw test -Dtest=EstoqueParametrizadoTest
+./mvnw test -Dtest=EstoqueRegressaoTest
 ./mvnw test -Dtest=EstoqueNaoFuncionalTest
 ```
 
@@ -76,8 +78,8 @@ Os testes não funcionais validam desempenho, carga e concorrência em [`Estoque
 
 ## Principais Evidências do Projeto
 
-- Suíte de testes: [`src/test/java/com/faculdade/testes/estoque/`](src/test/java/com/faculdade/testes/estoque/) — 72 testes, incluindo integração real (`EstoqueIntegracaoTest`), segurança (`EstoqueSegurancaTest`) e não funcionais (`EstoqueNaoFuncionalTest`)
+- Suíte de testes: [`src/test/java/com/faculdade/testes/estoque/`](src/test/java/com/faculdade/testes/estoque/) — 85 testes, incluindo unitários dedicados (`EstoqueUnitarioTest`), integração real (`EstoqueIntegracaoTest`), segurança (`EstoqueSegurancaTest`) e não funcionais (`EstoqueNaoFuncionalTest`)
 - Pipeline de CI/regressão: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 - Histórico de commits e Pull Requests: [GitHub](https://github.com/gustavopr662/pf-testes-controle-de-estoque)
-- Documentação complementar: [`docs/`](docs/), com [`docs/regras-de-negocio.md`](docs/regras-de-negocio.md) (R1 a R4, entradas válidas/inválidas, valores-limite e exceções) e [`docs/testes-nao-funcionais.md`](docs/testes-nao-funcionais.md) (desempenho, carga e concorrência)
-- Evidência de execução local: `.\mvnw.cmd test` — `Tests run: 72, Failures: 0, Errors: 0, Skipped: 0`
+- Documentação complementar: [`docs/`](docs/), com [`docs/regras-de-negocio.md`](docs/regras-de-negocio.md) (R1 a R4, entradas válidas/inválidas, valores-limite e exceções), [`docs/testes-nao-funcionais.md`](docs/testes-nao-funcionais.md) (desempenho, carga e concorrência) e [`docs/teste-regressao.md`](docs/teste-regressao.md) (comportamentos protegidos e testes que detectam regressão)
+- Evidência de execução local: `.\mvnw.cmd test` — `Tests run: 85, Failures: 0, Errors: 0, Skipped: 0`
