@@ -87,7 +87,7 @@ Após **toda saída bem-sucedida**, se `quantidadeAtual <= estoqueMinimo`, um sn
 | Operação rejeitada | Não |
 | Saídas seguidas enquanto a condição se mantém | Sim, uma notificação por saída |
 
-O snapshot é produzido dentro do lock do SKU e entregue aos listeners fora dele; a notificação recebe uma cópia, sem exponer o objeto mutável do estoque.
+O snapshot é produzido dentro do lock do SKU e entregue aos listeners fora dele; a notificação recebe uma cópia, sem expor o objeto mutável do estoque.
 
 ## R4 — Segurança, dados inválidos e concorrência
 

@@ -74,7 +74,7 @@ R4 — Operações com dados inválidos (valores nulos, negativos, SKU vazio ou 
 
 ## Breve Descrição dos Testes Não Funcionais
 
-Os testes não funcionais validam desempenho, carga e concorrência em [`EstoqueNaoFuncionalTest`](src/test/java/com/faculdade/testes/estoque/EstoqueNaoFuncionalTest.java): um lote sequencial de 4.000 movimentações (2.000 produtos) e um lote concorrente de 1.600 movimentações distribuídas em 200 SKUs, ambos com `assertTimeout` de 10 segundos e registro do tempo médio por movimentação. Também há contenção de 60 threads sobre o mesmo SKU, garantindo que saídas simultâneas não provoquem condição de corrida, perda de registros ou saldo negativo. Detalhes, métricas medidas e critérios de aceitação em [`docs/testes-nao-funcionais.md`](docs/testes-nao-funcionais.md).
+Os testes não funcionais validam desempenho, carga e concorrência em [`EstoqueNaoFuncionalTest`](src/test/java/com/faculdade/testes/estoque/EstoqueNaoFuncionalTest.java): um lote sequencial de 4.000 movimentações (2.000 produtos) e um lote concorrente de 1.600 movimentações distribuídas em 200 SKUs, ambos com `assertTimeout` de 10 segundos e registro do tempo médio por movimentação. Também há contenção de 60 operações sobre o mesmo SKU, executadas por um pool de 20 threads, garantindo que saídas simultâneas não provoquem condição de corrida, perda de registros ou saldo negativo. Detalhes, métricas medidas e critérios de aceitação em [`docs/testes-nao-funcionais.md`](docs/testes-nao-funcionais.md).
 
 ## Principais Evidências do Projeto
 

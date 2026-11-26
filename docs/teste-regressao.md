@@ -1,6 +1,6 @@
 # Teste de regressão
 
-Este documento registra alterações de código que já causaram (ou causariam) regressão nas regras R1 e R3 e os testes que as detectam. Os testes são executados localmente com `.\mvnw.cmd test` e na pipeline `.github/workflows/ci.yml`.
+Este documento registra alterações de código que causariam regressão nas regras R1 e R3 e os testes que as detectam. Os testes são executados localmente com `.\mvnw.cmd test` e na pipeline `.github/workflows/ci.yml`.
 
 ## Comportamento protegido 1 — alerta no limite inferior
 
