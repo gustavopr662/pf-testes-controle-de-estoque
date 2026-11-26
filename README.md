@@ -7,7 +7,7 @@
 
 ## Descrição
 
-Sistema de Controle de Estoque que registra entradas e saídas de produtos, controla saldo, limites mínimo e máximo, situação do produto e permissão de usuários. O foco da disciplina de Testes de Software é demonstrar, por meio de testes automatizados, que as regras de negócio funcionam adequadamente.
+Sistema de Controle de Estoque que registra entradas e saídas de produtos, controla saldo, limites mínimo e máximo, situação do produto e permissão de usuários.
 
 ## Principais Regras de Negócio
 
